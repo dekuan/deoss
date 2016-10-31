@@ -5,6 +5,29 @@ use Sts\Request\V20150401 as Sts;
 
 class CSTSOperate
 {
+
+	/**
+	 * 获得Oss操作token
+	 * $arrConfig参数表
+	 * <li> 'stsserver'			: sts服务地址
+	 * <li> 'accesskeyid'		: accessKeyId,ali云访问控制管理中创建的用户对应的accessKeyId
+	 * <li> 'accesskeysecret'	: accessKeySecret,ali云raw管理中创建的accessKeyId对应的accessKeySecret
+	 * <li> 'rolearn'			: 角色资源描述符，在RAM的控制台的资源详情页上可以获取
+	 * <li> 'tokeneffectivetime': token有效期
+	 * <li> 'policy'			: 创建的accessKeyId对应的用户授权策略
+	 *
+	 * @author wanganning
+	 * @modify-log
+	 *        name            date            reason
+	 *        王安宁
+	 *
+	 * @param $sClientName
+	 * @param $arrConfig
+	 * @param $arrRtn
+	 *
+	 * @return int
+	 * @throws \ClientException
+	 */
 	public static function getToken( $sClientName, $arrConfig, & $arrRtn )
 	{
 		include_once dirname(__FILE__) . '/../lib/aliyun-php-sdk-core/Config.php';
@@ -19,37 +42,35 @@ class CSTSOperate
 			return CErrCode::ERR_STS_GET_TOKEN_ARR_CONFIG;
 		}
 
-		if ( ! array_key_exists( CConst::CONST_KEY_STS_SERVER, $arrConfig )
-			|| ! is_string( $arrConfig [ CConst::CONST_KEY_STS_SERVER ] )
-		)
+		$sStsServer = array_key_exists( CConst::CONST_KEY_STS_SERVER, $arrConfig ) ? $arrConfig[ CConst::CONST_KEY_STS_SERVER ] : null;
+		if ( ! is_string( $sStsServer ) || strlen( $sStsServer ) <= 0 )
 		{
 			return CErrCode::ERR_STS_GET_TOKEN_CONFIG_STS_SERVER;
 		}
 
-		if ( ! array_key_exists( CConst::CONST_KEY_ACCESS_KEY_ID, $arrConfig )
-			|| ! is_string( $arrConfig[ CConst::CONST_KEY_ACCESS_KEY_ID ] )
-		)
+		$sAccessKeyId = array_key_exists( CConst::CONST_KEY_ACCESS_KEY_ID, $arrConfig ) ? $arrConfig[ CConst::CONST_KEY_ACCESS_KEY_ID ] : null;
+		if ( ! is_string( $sAccessKeyId ) || strlen( $sAccessKeyId ) <= 0 )
 		{
 			return CErrCode::ERR_STS_GET_TOKEN_CONFIG_ACCESS_KEY_ID;
 		}
 
-		if ( ! array_key_exists( CConst::CONST_KEY_ACCESS_KEY_SECRET, $arrConfig )
-			|| ! is_string( $arrConfig[ CConst::CONST_KEY_ACCESS_KEY_SECRET ] )
-		)
+		$sAccessKeySecret = array_key_exists( CConst::CONST_KEY_ACCESS_KEY_SECRET, $arrConfig ) ?
+			$arrConfig[ CConst::CONST_KEY_ACCESS_KEY_SECRET ] : null;
+		if ( ! is_string( $sAccessKeySecret ) || strlen( $sAccessKeySecret ) <= 0 )
 		{
 			return CErrCode::ERR_STS_GET_TOKEN_CONFIG_ACCESS_KEY_SECRET;
 		}
 
-		if ( ! array_key_exists( CConst::CONST_KEY_ROLEARN, $arrConfig )
-			|| ! is_string( $arrConfig[ CConst::CONST_KEY_ROLEARN ] )
-		)
+		// 角色资源描述符，在RAM的控制台的资源详情页上可以获取
+		$sRoleArn = array_key_exists( CConst::CONST_KEY_ROLEARN, $arrConfig ) ? $arrConfig[ CConst::CONST_KEY_ROLEARN ] : null;
+		if ( ! is_string( $sRoleArn ) || strlen( $sRoleArn ) <= 0 )
 		{
 			return CErrCode::ERR_STS_GET_TOKEN_CONFIG_ROLEARN;
 		}
 
-		if ( ! array_key_exists( CConst::CONST_KEY_TOKEN_EFFECTIVE_TIME, $arrConfig )
-			|| ! is_numeric( $arrConfig[ CConst::CONST_KEY_TOKEN_EFFECTIVE_TIME ] )
-		)
+		$nTokenEffectiveTime = array_key_exists( CConst::CONST_KEY_TOKEN_EFFECTIVE_TIME, $arrConfig ) ?
+			$arrConfig[ CConst::CONST_KEY_TOKEN_EFFECTIVE_TIME ] : null;
+		if ( ! is_numeric( $nTokenEffectiveTime ) || $nTokenEffectiveTime <= 0 )
 		{
 			return CErrCode::ERR_STS_GET_TOKEN_CONFIG_TOKEN_EFFECTIVE_TIME;
 		}
@@ -61,13 +82,6 @@ class CSTSOperate
 		}
 
 		$nErrCode = CErrCode::ERR_UNKNOWN;
-
-		$sStsServer 			= $arrConfig[ CConst::CONST_KEY_STS_SERVER ];
-		$sAccessKeyId 			= $arrConfig[ CConst::CONST_KEY_ACCESS_KEY_ID ];
-		$sAccessKeySecret		= $arrConfig[ CConst::CONST_KEY_ACCESS_KEY_SECRET ];
-		// 角色资源描述符，在RAM的控制台的资源详情页上可以获取
-		$sRoleArn 				= $arrConfig[ CConst::CONST_KEY_ROLEARN ];
-		$nTokenEffectiveTime	= $arrConfig[ CConst::CONST_KEY_TOKEN_EFFECTIVE_TIME ];
 
 		$oClientProfile = \DefaultProfile::getProfile( $sStsServer, $sAccessKeyId, $sAccessKeySecret );
 		$oClient = new \DefaultAcsClient( $oClientProfile );
