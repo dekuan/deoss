@@ -62,6 +62,33 @@ class COSSOperateTest extends \PHPUnit_Framework_TestCase
 	}
 
 
+	public function testUploadToOSSWithNoExt()
+	{
+		$this->skipTest( OSSTestSkip );
+		$sTestName = '上传图片到OSS';
+		$arrConfig = $this->_getDefaultConfig();
+
+		$arrTmpToken[ 'AccessKeyId' ] = $arrConfig[ 'accesskeyid' ];
+		$arrTmpToken[ 'AccessKeySecret' ] = $arrConfig[ 'accesskeysecret' ];
+		$arrTmpToken[ 'bktinnerurl' ] = $arrConfig[ 'ossserverinternal' ];
+		$arrTmpToken[ 'bkturl' ] = $arrConfig[ 'ossserver' ];
+		$arrTmpToken[ 'useinner' ] = \dekuan\deoss\CConst::CONST_NOT_USE_INNER;
+		$arrTmpToken[ 'bucket' ] = 'deimage';
+		$arrTmpToken[ 'filename' ] = '15191418717';
+		$arrTmpToken[ 'filepath' ] = __DIR__ . '/../15191418717';
+
+		$nErrCode = \dekuan\deoss\COSSOperate::uploadToOSS( $arrTmpToken );
+		if ( 0 == $nErrCode )
+		{
+			$this->echoTestResult( true, $sTestName );
+		}
+		else
+		{
+			$this->echoTestResult( false, $sTestName, '上传至oss失败,错误码:' . $nErrCode );
+		}
+	}
+
+
 	public function testUploadToOSSWithToken()
 	{
 		$this->skipTest( OSSTestSkip );
@@ -155,6 +182,25 @@ class COSSOperateTest extends \PHPUnit_Framework_TestCase
 		{
 			$this->echoTestResult( false, $sTestName, '验证失败,错误码:' . $nErrCode );
 		}
+
+		$arrTmpToken[ 'filename' ] = '15191418717';		//	不存在
+		$bRtn = false;
+		$nErrCode = \dekuan\deoss\COSSOperate::doesObjectExists( $arrTmpToken, $bRtn );
+		if ( 0 == $nErrCode )
+		{
+			if ( $bRtn )
+			{
+				$this->echoTestResult( true, $sTestName );
+			}
+			else
+			{
+				$this->echoTestResult( false, $sTestName, '验证结果与预期不符' );
+			}
+		}
+		else
+		{
+			$this->echoTestResult( false, $sTestName, '验证失败,错误码:' . $nErrCode );
+		}
 	}
 
 	public function testDoesObjectExistsWithToken()
@@ -230,7 +276,7 @@ class COSSOperateTest extends \PHPUnit_Framework_TestCase
 
 	public function testGetObject()
 	{
-		$this->skipTest( OSSTestSkip );
+		$this->skipTest( OSSTestSkip & 0 );
 		$sTestName = '从oss上获得对象信息';
 		$arrConfig = $this->_getDefaultConfig();
 
@@ -272,6 +318,25 @@ class COSSOperateTest extends \PHPUnit_Framework_TestCase
 		else
 		{
 			$this->echoTestResult( false, $sTestName, '获得object预期错误,错误码:' . $nErrCode );
+		}
+
+		$arrTmpToken[ 'filename' ] = '15191418717';		//	存在
+		$sRtn = null;
+		$nErrCode = \dekuan\deoss\COSSOperate::getObject( $arrTmpToken, $sRtn );
+		if ( 0 == $nErrCode )
+		{
+			if ( is_string( $sRtn ) && strlen( $sRtn ) > 0 )
+			{
+				$this->echoTestResult( true, $sTestName );
+			}
+			else
+			{
+				$this->echoTestResult( false, $sTestName, '获得object返回值验证失败' );
+			}
+		}
+		else
+		{
+			$this->echoTestResult( false, $sTestName, '获得object失败,错误码:' . $nErrCode );
 		}
 	}
 
@@ -396,14 +461,14 @@ class COSSOperateTest extends \PHPUnit_Framework_TestCase
 	private function _getDefaultConfig()
 	{
 		$arrConfig = [
-			'accesskeyid' => '',
-			'accesskeysecret' => '',
-			'bucket' => '',
-			'ossserverinternal' => '',
-			'ossserver' => '',
-			'stsserver' => '',
-			'rolearn' => '',
-			'tokeneffectivetime' => '',
+			'accesskeyid' => 'LTAIAV4YnHFslQLX',
+			'accesskeysecret' => 'X39ahW2PieiOlVg47OMxu1kT5srjcT',
+			'bucket' => 'deimage',
+			'ossserverinternal' => 'oss-cn-beijing-internal.aliyuncs.com',
+			'ossserver' => 'oss-cn-beijing.aliyuncs.com',
+			'stsserver' => 'cn-hangzhou',
+			'rolearn' => 'acs:ram::1221465791569748:role/img-writer',
+			'tokeneffectivetime' => 1200,
 			'policy' => <<<EOF
 				{
   					"Statement": [
@@ -417,7 +482,7 @@ class COSSOperateTest extends \PHPUnit_Framework_TestCase
 				}
 EOF
 			,
-			'imgurl' => ''
+			'imgurl' => 'deimage.dekuan.org'
 		];
 
 		return $arrConfig;
