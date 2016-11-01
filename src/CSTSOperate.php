@@ -1,7 +1,9 @@
 <?php
 namespace dekuan\deoss;
 
+use OSS\Core\OssException;
 use Sts\Request\V20150401 as Sts;
+use HttpResponse;
 
 class CSTSOperate
 {
@@ -19,13 +21,13 @@ class CSTSOperate
 	 * @author wanganning
 	 * @modify-log
 	 *        name            date            reason
-	 *        王安宁
+	 *        王安宁			2016-10-31			创建
 	 *
 	 * @param $sClientName
-	 * @param $arrConfig
-	 * @param $arrRtn
+	 * @param $arrConfig		array		参数数组
+	 * @param $arrRtn			array		返回的token数组
 	 *
-	 * @return int
+	 * @return int			错误码
 	 * @throws \ClientException
 	 */
 	public static function getToken( $sClientName, $arrConfig, & $arrRtn )
@@ -90,16 +92,30 @@ class CSTSOperate
 		$request->setRoleArn( $sRoleArn );
 		$request->setPolicy( $sPolicy );
 		$request->setDurationSeconds( $nTokenEffectiveTime );
-		$response = $oClient->doAction($request);
-
-		if ( is_array( $response ) )
+		try
 		{
-			$arrRtn = $response;
-			$nErrCode = CErrCode::ERR_SUCCESS;
+			$response = $oClient->doAction($request);
+			if ( $response && $response instanceof HttpResponse )
+			{
+				$sBody = $response->getBody();
+				if ( is_string( $sBody ) )
+				{
+					$arrRtn = @json_decode( $sBody, true );
+					$nErrCode = CErrCode::ERR_SUCCESS;
+				}
+				else
+				{
+					$nErrCode = CErrCode::ERR_STS_GET_TOKEN_RESPONSE_BODY;
+				}
+			}
+			else
+			{
+				$nErrCode = CErrCode::ERR_STS_GET_TOKEN_RESPONSE;
+			}
 		}
-		else
+		catch( OssException $e )
 		{
-			$nErrCode = CErrCode::ERR_STS_GET_TOKEN_RESPONSE;
+			$nErrCode = CErrCode::ERR_STS_GET_TOKEN_EXCEPTION;
 		}
 
 		return $nErrCode;

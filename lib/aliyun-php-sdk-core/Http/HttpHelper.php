@@ -36,7 +36,7 @@ class HttpHelper
 		curl_setopt($ch, CURLOPT_FAILONERROR, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, is_array($postFields) ? self::getPostHttpBody($postFields) : $postFields);
-		
+
 		if (self::$readTimeout) {
 			curl_setopt($ch, CURLOPT_TIMEOUT, self::$readTimeout);
 		}
@@ -58,7 +58,6 @@ class HttpHelper
 		$httpResponse->setStatus(curl_getinfo($ch, CURLINFO_HTTP_CODE));
 		if (curl_errno($ch))
 		{
-			print_r( $httpResponse );
 			throw new ClientException("Speicified endpoint or uri is not valid.", "SDK.ServerUnreachable");
 		}
 		curl_close($ch);

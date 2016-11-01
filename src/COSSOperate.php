@@ -3,6 +3,7 @@ namespace dekuan\deoss;
 
 //use OSS\AssumeRoleRequest;
 //use \Sts\Request\V20150401 as Sts;
+use OSS\Core\OssException;
 use OSS\OssClient;
 
 
@@ -22,6 +23,7 @@ class COSSOperate
 	 * <li> 'bucket'			: [必需]上传到的bucket名称
 	 * <li> 'filename'			: [必需]上传的对象名称,如果存在相同名称的对象,则覆盖
 	 * <li> 'filepath'			: [必需]上传的对象本地地址
+	 * <li> 'SecurityToken'		: [非必需]使用token的accessKeyId及secret需要带此参数,参数为请求token中的原值
 	 *
 	 * @author wanganning
 	 * @modify-log
@@ -62,14 +64,22 @@ class COSSOperate
 		{
 			if ( $oClient instanceof OssClient )
 			{
-				$infoRtn = $oClient->uploadFile( $sBucketName, $sFileName, $sFilePath );
-				if ( ! is_null( $infoRtn ) )
+				try
 				{
-					$nErrCode = CErrCode::ERR_SUCCESS;
+					$infoRtn = $oClient->uploadFile( $sBucketName, $sFileName, $sFilePath );
+
+					if ( is_null( $infoRtn ) )
+					{
+						$nErrCode = CErrCode::ERR_SUCCESS;
+					}
+					else
+					{
+						$nErrCode = CErrCode::ERR_OSS_UPLOAD_FAIL;
+					}
 				}
-				else
+				catch( OssException $e )
 				{
-					$nErrCode = CErrCode::ERR_OSS_UPLOAD_FAIL;
+					$nErrCode = CErrCode::ERR_OSS_UPLOAD_EXCEPTION;
 				}
 			}
 			else
@@ -80,7 +90,6 @@ class COSSOperate
 
 		return $nErrCode;
 	}
-
 
 	/**
 	 * 查询指定对象在oss中是否存在
@@ -95,6 +104,7 @@ class COSSOperate
 	 * <li> 'bkturl'			: [必需]请求bucket外网连接地址
 	 * <li> 'bucket'			: [必需]上传到的bucket名称
 	 * <li> 'filename'			: [必需]上传的对象名称,如果存在相同名称的对象,则覆盖
+	 * <li> 'SecurityToken'		: [非必需]使用token的accessKeyId及secret需要带此参数,参数为请求token中的原值
 	 *
 	 * @author wanganning
 	 * @modify-log
@@ -133,8 +143,15 @@ class COSSOperate
 		{
 			if ( $oClient instanceof OssClient )
 			{
-				$bRtn = $oClient->doesObjectExist( $sBuckName, $sFileName );
-				$nErrCode = CErrCode::ERR_SUCCESS;
+				try
+				{
+					$bRtn = $oClient->doesObjectExist( $sBuckName, $sFileName );
+					$nErrCode = CErrCode::ERR_SUCCESS;
+				}
+				catch( OssException $e )
+				{
+					$nErrCode = CErrCode::ERR_OSS_DOES_EXISTS_OBJECT_EXCEPTION;
+				}
 			}
 			else
 			{
@@ -159,6 +176,7 @@ class COSSOperate
 	 * <li> 'bkturl'			: [必需]请求bucket外网连接地址
 	 * <li> 'bucket'			: [必需]上传到的bucket名称
 	 * <li> 'filename'			: [必需]上传的对象名称,如果存在相同名称的对象,则覆盖
+	 * <li> 'SecurityToken'		: [非必需]使用token的accessKeyId及secret需要带此参数,参数为请求token中的原值
 	 *
 	 * @author wanganning
 	 * @modify-log
@@ -197,14 +215,21 @@ class COSSOperate
 		{
 			if ( $oClient instanceof OssClient )
 			{
-				$sRtn = $oClient->getObject( $sBucketName, $sFileName );
-				if ( is_string( $sRtn ) && strlen( $sRtn ) > 0 )
+				try
 				{
-					$nErrCode = CErrCode::ERR_SUCCESS;
+					$sRtn = $oClient->getObject( $sBucketName, $sFileName );
+					if ( is_string( $sRtn ) && strlen( $sRtn ) > 0 )
+					{
+						$nErrCode = CErrCode::ERR_SUCCESS;
+					}
+					else
+					{
+						$nErrCode = CErrCode::ERR_OSS_GET_OSS_FAIL;
+					}
 				}
-				else
+				catch( OssException $e )
 				{
-					$nErrCode = CErrCode::ERR_OSS_GET_OSS_FAIL;
+					$nErrCode = CErrCode::ERR_OSS_GET_OSS_EXCEPTION;
 				}
 			}
 			else
@@ -240,7 +265,7 @@ class COSSOperate
 	 * @return int
 	 * @throws \OSS\Core\OssException
 	 */
-	public static function ImgProcess( $arrPara, & $sRtn )
+	public static function imgProcess( $arrPara, & $sRtn )
 	{
 		if ( ! is_array( $arrPara ) )
 		{
@@ -272,14 +297,21 @@ class COSSOperate
 		{
 			if ( $oClient instanceof OssClient )
 			{
-				$sRtn = $oClient->signUrl( $sBucket, $sFileName, $nValidTime );
-				if ( is_string( $sRtn ) && strlen( $sRtn ) > 0 )
+				try
 				{
-					$nErrCode = CErrCode::ERR_SUCCESS;
+					$sRtn = $oClient->signUrl( $sBucket, $sFileName, $nValidTime );
+					if ( is_string( $sRtn ) && strlen( $sRtn ) > 0 )
+					{
+						$nErrCode = CErrCode::ERR_SUCCESS;
+					}
+					else
+					{
+						$nErrCode = CErrCode::ERR_OSS_GET_IMG_PROCESS_SIGN_RTN;
+					}
 				}
-				else
+				catch( OssException $e )
 				{
-					$nErrCode = CErrCode::ERR_OSS_GET_IMG_PROCESS_SIGN_RTN;
+					$nErrCode = CErrCode::ERR_OSS_GET_IMG_PROCESS_SIGN_EXCEPTION;
 				}
 			}
 			else
@@ -303,6 +335,7 @@ class COSSOperate
 	 * <li> 'conntimeout'		: [非必需]client连接超时时间,默认CConst::CONST_CONN_TIMEOUT
 	 * <li> 'bktinnerurl'		: [必需]请求bucket内网连接地址
 	 * <li> 'bkturl'			: [必需]请求bucket外网连接地址
+	 * <li> 'SecurityToken'		: [非必需]使用token的accessKeyId及secret需要带此参数,参数为请求token中的原值
 	 *
 	 * @author wanganning
 	 * @modify-log
@@ -363,6 +396,14 @@ class COSSOperate
 			return CErrCode::ERR_OSS_GET_CLIENT_PARA_BUCKET_URL;
 		}
 
+		$sSecretToken = array_key_exists( 'SecurityToken', $arrPara ) ? $arrPara[ 'SecurityToken' ] : null;
+		if ( ! is_null( $sSecretToken )
+			&& ( ! is_string( $sSecretToken ) || strlen( $sSecretToken ) <= 0 )
+		)
+		{
+			return CErrCode::ERR_OSS_GET_CLIENT_PARA_SECRET_TOKEN;
+		}
+
 		$nErrCode = CErrCode::ERR_UNKNOWN;
 
 		$sEndPoint = '';
@@ -375,7 +416,7 @@ class COSSOperate
 			$sEndPoint = $sBktInnerUrl;
 		}
 
-		$oClientRtn = new OssClient( $sAccessKeyId, $sAccessKeySecret, $sEndPoint );
+		$oClientRtn = new OssClient( $sAccessKeyId, $sAccessKeySecret, $sEndPoint, false, $sSecretToken );
 		$oClientRtn->setTimeout( $nTimeOut );
 		$oClientRtn->setConnectTimeout( $nConnTimeOut );
 		$nErrCode = CErrCode::ERR_SUCCESS;
@@ -443,7 +484,7 @@ class COSSOperate
 		$nErrCode = CErrCode::ERR_UNKNOWN;
 
 		$sEndPoint = $sImgUrl;
-		$oClientRtn = new OssClient( $sAccessKeyId, $sAccessKeySecret, $sEndPoint );
+		$oClientRtn = new OssClient( $sAccessKeyId, $sAccessKeySecret, $sEndPoint, true );
 		$oClientRtn->setTimeout( $nTimeOut );
 		$oClientRtn->setConnectTimeout( $nConnTimeOut );
 		$nErrCode = CErrCode::ERR_SUCCESS;

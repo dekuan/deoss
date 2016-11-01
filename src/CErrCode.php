@@ -15,12 +15,15 @@ class CErrCode {
 	const ERR_STS_GET_TOKEN_CLIENT_NAME					= self::ERR_BASE - 7;		//	STS 获得token接口,用户端oss名称参数错误
 	const ERR_STS_GET_TOKEN_RESPONSE					= self::ERR_BASE - 8;		//	STS 获得token接口,返回参数错误
 	const ERR_STS_GET_POLICY							= self::ERR_BASE - 9;		//	STS 获得token接口,policy参数错误
+	const ERR_STS_GET_TOKEN_RESPONSE_BODY				= self::ERR_BASE - 10;		//	STS 获得token接口,responseBody获取失败
+	const ERR_STS_GET_TOKEN_EXCEPTION					= self::ERR_BASE - 11;		//	STS 获得token接口,获得token异常
 
 	const ERR_OSS_UPLOAD_PARA_BUCKET_NAME				= self::ERR_BASE - 20;		//	oss 上传文件到oss,bucket name参数错误
 	const ERR_OSS_UPLOAD_PARA_FILE_NAME					= self::ERR_BASE - 21;		//	oss 上传文件到oss,file name参数错误
 	const ERR_OSS_UPLOAD_PARA_FILE_PATH					= self::ERR_BASE - 22;		//	oss 上传文件到oss,file path参数错误
 	const ERR_OSS_UPLOAD_CLIENT_ERR						= self::ERR_BASE - 23;		//	oss 上传文件到oss,获得client实例失败
 	const ERR_OSS_UPLOAD_FAIL							= self::ERR_BASE - 24;		//	oss 上传文件到oss,上传失败
+	const ERR_OSS_UPLOAD_EXCEPTION						= self::ERR_BASE - 25;		//	oss 上传文件到oss,发生异常
 
 	const ERR_OSS_GET_CLIENT_PARA_ACCESS_KEY_ID			= self::ERR_BASE - 30;		//	oss 获得client实例,accessKeyId参数错误
 	const ERR_OSS_GET_CLIENT_PARA_ACCESS_KEY_SECRET		= self::ERR_BASE - 31;		//	oss 获得client实例,accessKeySecret参数错误
@@ -30,17 +33,20 @@ class CErrCode {
 	const ERR_OSS_GET_CLIENT_PARA_BUCKET_INNER_URL		= self::ERR_BASE - 35;		//	oss 获得client实例,内网连接网络参数错误
 	const ERR_OSS_GET_CLIENT_PARA_BUCKET_URL			= self::ERR_BASE - 36;		//	oss 获得client实例,外网连接网络参数错误
 	const ERR_OSS_GET_CLIENT_PARA_ARR					= self::ERR_BASE - 37;		//	oss 获得client实例,请求参数错误
+	const ERR_OSS_GET_CLIENT_PARA_SECRET_TOKEN			= self::ERR_BASE - 38;		//	oss 获得client实例,secret token参数错误
 
 	const ERR_OSS_DOES_EXISTS_OBJECT_PARA_ARR			= self::ERR_BASE - 40;		//	oss 判断对象是否存在,参数数组错误
 	const ERR_OSS_DOES_EXISTS_OBJECT_PARA_BUCKET		= self::ERR_BASE - 41;		//	oss 判断对象是否存在,bucket name参数错误
 	const ERR_OSS_DOES_EXISTS_OBJECT_PARA_FILENAME		= self::ERR_BASE - 42;		//	oss 判断对象是否存在,对象名参数错误
 	const ERR_OSS_DOES_EXISTS_OBJECT_CLIENT				= self::ERR_BASE - 43;		//	oss 判断对象是否存在,获得client对象失败
+	const ERR_OSS_DOES_EXISTS_OBJECT_EXCEPTION			= self::ERR_BASE - 44;		//	oss 判断对象是否存在,获得client对象异常
 
 	const ERR_OSS_GET_OSS_PARA_ARR						= self::ERR_BASE - 50;		//	oss 获得oss对象,参数列表错误
 	const ERR_OSS_GET_OSS_PARA_BUCKET					= self::ERR_BASE - 51;		//	oss 获得oss对象,bucket name参数错误
 	const ERR_OSS_GET_OSS_PARA_FILE_NAME				= self::ERR_BASE - 52;		//	oss 获得oss对象,对象名参数错误
 	const ERR_OSS_GET_OSS_FAIL							= self::ERR_BASE - 53;		//	oss 获得oss对象,结果错误
 	const ERR_OSS_GET_OSS_CLIENT						= self::ERR_BASE - 54;		//	oss 获得oss对象,client获取失败
+	const ERR_OSS_GET_OSS_EXCEPTION						= self::ERR_BASE - 55;		//	oss 获得oss对象,异常
 
 	const ERR_OSS_GET_CLIENT_WITH_IMG_PARA_ARR					= self::ERR_BASE - 60;		//	oss 获得oss对象,client获取失败
 	const ERR_OSS_GET_CLIENT_WITH_IMG_PARA_ACCESS_KEY_ID		= self::ERR_BASE - 61;		//	oss 获得oss对象,assessKeyId参数错误
@@ -48,6 +54,7 @@ class CErrCode {
 	const ERR_OSS_GET_CLIENT_WITH_IMG_PARA_TIMEOUT				= self::ERR_BASE - 63;		//	oss 获得oss对象,超时时间参数错误
 	const ERR_OSS_GET_CLIENT_WITH_IMG_PARA_CONN_TIMEOUT			= self::ERR_BASE - 64;		//	oss 获得oss对象,连接超时时间参数错误
 	const ERR_OSS_GET_CLIENT_WITH_IMG_PARA_IMG_URL				= self::ERR_BASE - 65;		//	oss 获得oss对象,图片访问url参数错误
+	const ERR_OSS_GET_CLIENT_WITH_IMG_PARA_SECRET_TOKEN			= self::ERR_BASE - 66;		//	oss 获得oss对象,token secret 参数错误
 
 	const ERR_OSS_GET_IMG_PROCESS_PARA_ARR						= self::ERR_BASE - 70;		//	oss 获得图片访问地址,参数数组错误
 	const ERR_OSS_GET_IMG_PROCESS_PARA_BUCKET					= self::ERR_BASE - 71;		//	oss 获得图片访问地址,bucket参数错误
@@ -55,6 +62,7 @@ class CErrCode {
 	const ERR_OSS_GET_IMG_PROCESS_PARA_VALID_TIME				= self::ERR_BASE - 73;		//	oss 获得图片访问地址,有效期参数错误
 	const ERR_OSS_GET_IMG_PROCESS_SIGN_RTN						= self::ERR_BASE - 74;		//	oss 获得图片访问地址,获得的返回值错误
 	const ERR_OSS_GET_IMG_PROCESS_GET_CLIENT					= self::ERR_BASE - 75;		//	oss 获得图片访问地址,获得client失败
+	const ERR_OSS_GET_IMG_PROCESS_SIGN_EXCEPTION				= self::ERR_BASE - 76;		//	oss 获得图片访问地址,sign 异常
 
 
 }
