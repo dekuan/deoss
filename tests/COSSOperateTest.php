@@ -131,6 +131,49 @@ class COSSOperateTest extends \PHPUnit_Framework_TestCase
 		}
 	}
 
+
+	public function testUploadToOSSWithReadToken()
+	{
+		$this->skipTest( OSSTestSkip & 0 );
+		$sTestName = '使用token上传图片到OSS';
+		$arrConfig = $this->_getReadConfig();
+
+		$arrToken = [];
+		$nErrCode = \dekuan\deoss\CSTSOperate::getToken( '1234567890', $arrConfig, $arrToken );
+
+		if ( 0 == $nErrCode )
+		{
+			if ( ( is_array( $arrToken ) && array_key_exists( 'Credentials', $arrToken ) ) )
+			{
+				$arrTmpToken = $arrToken[ 'Credentials' ];
+				$arrTmpToken[ 'bktinnerurl' ] = $arrConfig[ 'ossserverinternal' ];
+				$arrTmpToken[ 'bkturl' ] = $arrConfig[ 'ossserver' ];
+				$arrTmpToken[ 'useinner' ] = \dekuan\deoss\CConst::CONST_NOT_USE_INNER;
+				$arrTmpToken[ 'bucket' ] = 'deimage';
+				$arrTmpToken[ 'filename' ] = 'test1.jpg';
+				$arrTmpToken[ 'filepath' ] = __DIR__ . '/../test.jpg';
+
+				$nErrCode = \dekuan\deoss\COSSOperate::uploadToOSS( $arrTmpToken );
+				if ( 0 == $nErrCode )
+				{
+					$this->echoTestResult( true, $sTestName );
+				}
+				else
+				{
+					$this->echoTestResult( false, $sTestName, '上传至oss失败,错误码:' . $nErrCode );
+				}
+			}
+			else
+			{
+				$this->echoTestResult( false, $sTestName, 'token验证失败' );
+			}
+		}
+		else
+		{
+			$this->echoTestResult( false, $sTestName, 'token获取失败' );
+		}
+	}
+
 	public function testDoesObjectExists()
 	{
 		$this->skipTest( OSSTestSkip );
@@ -273,10 +316,80 @@ class COSSOperateTest extends \PHPUnit_Framework_TestCase
 		}
 	}
 
+	public function testDoesObjectExistsWithReadToken()
+	{
+		$this->skipTest( OSSTestSkip );
+		$sTestName = '使用只有读权限token验证object在oss是否存在';
+
+		$arrConfig = $this->_getReadConfig();
+
+		$arrToken = [];
+		$nErrCode = \dekuan\deoss\CSTSOperate::getToken( '1234567890', $arrConfig, $arrToken );
+
+		if ( 0 == $nErrCode )
+		{
+			if ( ( is_array( $arrToken ) && array_key_exists( 'Credentials', $arrToken ) ) )
+			{
+				$arrTmpToken = $arrToken[ 'Credentials' ];
+				$arrTmpToken[ 'bktinnerurl' ] = $arrConfig[ 'ossserverinternal' ];
+				$arrTmpToken[ 'bktinnerurl' ] = $arrConfig[ 'ossserverinternal' ];
+				$arrTmpToken[ 'bkturl' ] = $arrConfig[ 'ossserver' ];
+				$arrTmpToken[ 'useinner' ] = \dekuan\deoss\CConst::CONST_NOT_USE_INNER;
+				$arrTmpToken[ 'bucket' ] = 'deimage';
+				$arrTmpToken[ 'filename' ] = 'test1.jpg';		//	存在
+
+				$bRtn = false;
+				$nErrCode = \dekuan\deoss\COSSOperate::doesObjectExists( $arrTmpToken, $bRtn );
+				if ( 0 == $nErrCode )
+				{
+					if ( $bRtn )
+					{
+						$this->echoTestResult( true, $sTestName );
+					}
+					else
+					{
+						$this->echoTestResult( false, $sTestName, '验证结果与预期不符' );
+					}
+				}
+				else
+				{
+					$this->echoTestResult( false, $sTestName, '验证失败,错误码:' . $nErrCode );
+				}
+
+				$arrTmpToken[ 'filename' ] = 'test2.jpg';		//	不存在
+				$bRtn = false;
+				$nErrCode = \dekuan\deoss\COSSOperate::doesObjectExists( $arrTmpToken, $bRtn );
+				if ( 0 == $nErrCode )
+				{
+					if ( ! $bRtn )
+					{
+						$this->echoTestResult( true, $sTestName );
+					}
+					else
+					{
+						$this->echoTestResult( false, $sTestName, '验证结果与预期不符' );
+					}
+				}
+				else
+				{
+					$this->echoTestResult( false, $sTestName, '验证失败,错误码:' . $nErrCode );
+				}
+			}
+			else
+			{
+				$this->echoTestResult( false, $sTestName, 'token验证失败' );
+			}
+		}
+		else
+		{
+			$this->echoTestResult( false, $sTestName, 'token获取失败' );
+		}
+	}
+
 
 	public function testGetObject()
 	{
-		$this->skipTest( OSSTestSkip & 0 );
+		$this->skipTest( OSSTestSkip );
 		$sTestName = '从oss上获得对象信息';
 		$arrConfig = $this->_getDefaultConfig();
 
@@ -340,12 +453,74 @@ class COSSOperateTest extends \PHPUnit_Framework_TestCase
 		}
 	}
 
-
 	public function testGetObjectWithToken()
 	{
 		$this->skipTest( OSSTestSkip );
 		$sTestName = '使用token从oss上获得对象信息';
 		$arrConfig = $this->_getDefaultConfig();
+
+		$arrToken = [];
+		$nErrCode = \dekuan\deoss\CSTSOperate::getToken( '1234567890', $arrConfig, $arrToken );
+
+		if ( 0 == $nErrCode )
+		{
+			if ( ( is_array( $arrToken ) && array_key_exists( 'Credentials', $arrToken ) ) )
+			{
+				$arrTmpToken = $arrToken[ 'Credentials' ];
+				$arrTmpToken[ 'bktinnerurl' ] = $arrConfig[ 'ossserverinternal' ];
+				$arrTmpToken[ 'bkturl' ] = $arrConfig[ 'ossserver' ];
+				$arrTmpToken[ 'useinner' ] = \dekuan\deoss\CConst::CONST_NOT_USE_INNER;
+				$arrTmpToken[ 'bucket' ] = 'deimage';
+				$arrTmpToken[ 'filename' ] = 'test.jpg';		//	存在
+
+				$sRtn = null;
+				$nErrCode = \dekuan\deoss\COSSOperate::getObject( $arrTmpToken, $sRtn );
+				if ( 0 == $nErrCode )
+				{
+					if ( is_string( $sRtn ) && strlen( $sRtn ) > 0 )
+					{
+						$this->echoTestResult( true, $sTestName );
+					}
+					else
+					{
+						$this->echoTestResult( false, $sTestName, '获得object返回值验证失败' );
+					}
+				}
+				else
+				{
+					$this->echoTestResult( false, $sTestName, '获得object失败,错误码:' . $nErrCode );
+				}
+
+
+				$arrTmpToken[ 'filename' ] = 'test2.jpg';		//	不存在
+
+				$sRtn = null;
+				$nErrCode = \dekuan\deoss\COSSOperate::getObject( $arrTmpToken, $sRtn );
+				if ( \dekuan\deoss\CErrCode::ERR_OSS_GET_OSS_EXCEPTION == $nErrCode )
+				{
+					$this->echoTestResult( true, $sTestName );
+				}
+				else
+				{
+					$this->echoTestResult( false, $sTestName, '获得object预期错误,错误码:' . $nErrCode );
+				}
+			}
+			else
+			{
+				$this->echoTestResult( false, $sTestName, 'token验证失败' );
+			}
+		}
+		else
+		{
+			$this->echoTestResult( false, $sTestName, 'token获取失败' );
+		}
+	}
+
+	public function testGetObjectWithTokenReadPolicy()
+	{
+		$this->skipTest( OSSTestSkip );
+		$sTestName = '使用read token从oss上获得对象信息';
+		$arrConfig = $this->_getReadConfig();
 
 		$arrToken = [];
 		$nErrCode = \dekuan\deoss\CSTSOperate::getToken( '1234567890', $arrConfig, $arrToken );
@@ -483,6 +658,37 @@ class COSSOperateTest extends \PHPUnit_Framework_TestCase
 EOF
 			,
 			'imgurl' => 'deimage.dekuan.org'
+		];
+
+		return $arrConfig;
+	}
+
+
+
+	private function _getReadConfig()
+	{
+		$arrConfig = [
+			'accesskeyid' => '',
+			'accesskeysecret' => '',
+			'bucket' => '',
+			'ossserverinternal' => '',
+			'ossserver' => '',
+			'stsserver' => '',
+			'rolearn' => '',
+			'tokeneffectivetime' => '',
+			'policy' => <<<EOF
+				{
+					"Version": "1",
+					"Statement":
+					[{
+						"Effect": "Allow",
+						"Action": ["oss:List*", "oss:Get*"],
+						"Resource": ["acs:oss:*:*:deimage", "acs:oss:*:*:deimage/*"]
+					}]
+				}
+EOF
+			,
+			'imgurl' => ''
 		];
 
 		return $arrConfig;
