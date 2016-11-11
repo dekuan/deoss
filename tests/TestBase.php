@@ -39,6 +39,38 @@ EOF
 
 
 
+	public function getOneFileConfig()
+	{
+		$arrConfig = [
+			'accesskeyid' => 'LTAIAV4YnHFslQLX',
+			'accesskeysecret' => 'X39ahW2PieiOlVg47OMxu1kT5srjcT',
+			'bucket' => 'deimage',
+			'ossserverinternal' => 'oss-cn-beijing-internal.aliyuncs.com',
+			'ossserver' => 'oss-cn-beijing.aliyuncs.com',
+			'stsserver' => 'cn-hangzhou',
+			'rolearn' => 'acs:ram::1221465791569748:role/img-writer',
+			'tokeneffectivetime' => 1200,
+			'policy' => <<<EOF
+				{
+  					"Statement": [
+    				{
+      					"Action": "oss:PutObject",
+      					"Effect": "Allow",
+      					"Resource": [ "acs:oss:*:*:deimage/onlyonefile.jpg"]
+					}
+				  ],
+				  "Version": "1"
+				}
+EOF
+			,
+			'imgurl' => 'http://deimage.dekuan.org'
+		];
+
+		return $arrConfig;
+	}
+
+
+
 	public function getReadConfig()
 	{
 		$arrConfig = [

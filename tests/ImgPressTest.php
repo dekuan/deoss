@@ -61,7 +61,7 @@ class ImgPressTest extends TestBase
 
 	public function testImgPressWithDir()
 	{
-		$this->skipTest( ImgPressTestSkip & 0 );
+		$this->skipTest( ImgPressTestSkip );
 		$sTestName = '获得oss文件夹中的图片请求url';
 		$arrConfig = $this->getDefaultConfig();
 
