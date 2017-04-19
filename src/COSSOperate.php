@@ -5,7 +5,7 @@ namespace dekuan\deoss;
 //use \Sts\Request\V20150401 as Sts;
 use OSS\Core\OssException;
 use OSS\OssClient;
-
+use dekuan\delib\CLib;
 
 class COSSOperate
 {
@@ -66,9 +66,20 @@ class COSSOperate
 			{
 				try
 				{
+					//
+					//	try to upload
+					//
 					$infoRtn = $oClient->uploadFile( $sBucketName, $sFileName, $sFilePath );
 
-					if ( is_null( $infoRtn ) )
+					//
+					//	check the result
+					//
+					if ( CLib::IsArrayWithKeys( $infoRtn, 'info' ) &&
+						CLib::IsArrayWithKeys( $infoRtn[ 'info' ], [ 'http_code', 'size_upload' ] ) &&
+						is_numeric( $infoRtn[ 'info' ][ 'http_code' ] ) &&
+						200 == $infoRtn[ 'info' ][ 'http_code' ] &&
+						is_numeric( $infoRtn[ 'info' ][ 'size_upload' ] ) &&
+						$infoRtn[ 'info' ][ 'size_upload' ] > 0 )
 					{
 						$nErrCode = CErrCode::ERR_SUCCESS;
 					}
